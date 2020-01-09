@@ -1,18 +1,30 @@
-FROM openjdk:8-jre-alpine
+FROM openjdk:8-jdk-alpine
 
-LABEL maintainer="Hiroshi Saeki"
+# ttf-dejavu: Fix NPE on font rendering https://github.com/docker-library/openjdk/issues/73
+RUN apk add --no-cache git curl bash ttf-dejavu
 
-ENV GITBUCKET_HOME=/gitbucket GITBUCKET_TMPDIR=${GITBUCKET_HOME}/tmp
+ENV GITBUCKET_HOME /var/gitbucket
 
-ADD https://github.com/gitbucket/gitbucket/releases/download/4.33.0/gitbucket.war /opt/gitbucket.war
+RUN mkdir -p /usr/share/gitbucket
 
-RUN mkdir -p $GITBUCKET_HOME $GITBUCKET_TMPDIR; \
-    chmod -R a+rwx $GITBUCKET_HOME /opt $GITBUCKET_TMPDIR
-# Port for web page
+VOLUME /var/gitbucket
+
+ENV GITBUCKET_VERSION 4.33.0
+RUN curl -fL "https://github.com/gitbucket/gitbucket/releases/download/${GITBUCKET_VERSION}/gitbucket.war" -o /usr/share/gitbucket/gitbucket.war
+
+COPY gitbucket.sh /usr/share/gitbucket/gitbucket.sh
+RUN chmod +x /usr/share/gitbucket/gitbucket.sh
+
+# Port for web service
 EXPOSE 8080
 # Port for SSH access to git repository (Optional)
 EXPOSE 29418
 
+# Run as dedicated user
 USER 1001
 
-CMD ["sh", "-c", "java -jar /opt/gitbucket.war"]
+# Configure heap memory by cgroup memory limit
+# https://blogs.oracle.com/java-platform-group/java-se-support-for-docker-cpu-and-memory-limits
+ENV JAVA_OPTS -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap
+
+CMD ["/usr/share/gitbucket/gitbucket.sh"]
