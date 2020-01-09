@@ -5,13 +5,13 @@ RUN apk add --no-cache git curl bash ttf-dejavu
 
 VOLUME /var/gitbucket
 
+ENV GITBUCKET_VERSION=4.33.0 GITBUCKET_PORT=8080 GITBUCKET_HOME=/var/gitbucket
+
 RUN mkdir -p /usr/share/gitbucket && \
     curl -fL "https://github.com/gitbucket/gitbucket/releases/download/${GITBUCKET_VERSION}/gitbucket.war" -o /usr/share/gitbucket/gitbucket.war
 
 COPY gitbucket.sh /usr/share/gitbucket/gitbucket.sh
 RUN chmod +x /usr/share/gitbucket/gitbucket.sh
-
-ENV GITBUCKET_VERSION=4.33.0 GITBUCKET_PORT=8080 GITBUCKET_HOME=/var/gitbucket
 
 # Port for web service
 EXPOSE 8080
