@@ -25,6 +25,6 @@ USER 1001
 
 # Configure heap memory by cgroup memory limit
 # https://blogs.oracle.com/java-platform-group/java-se-support-for-docker-cpu-and-memory-limits
-ENV JAVA_OPTS -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap
+ENV JAVA_OPTS="-XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap"
 
 CMD ["/usr/share/gitbucket/gitbucket.sh"]
