@@ -3,13 +3,11 @@ FROM openjdk:8-jdk-alpine
 # ttf-dejavu: Fix NPE on font rendering https://github.com/docker-library/openjdk/issues/73
 RUN apk add --no-cache git curl bash ttf-dejavu
 
-ENV GITBUCKET_HOME /var/gitbucket
+VOLUME /var/gitbucket
 
 RUN mkdir -p /usr/share/gitbucket
 
-VOLUME /var/gitbucket
-
-ENV GITBUCKET_VERSION 4.33.0
+ENV GITBUCKET_VERSION=4.33.0 GITBUCKET_PORT=8080
 RUN curl -fL "https://github.com/gitbucket/gitbucket/releases/download/${GITBUCKET_VERSION}/gitbucket.war" -o /usr/share/gitbucket/gitbucket.war
 
 COPY gitbucket.sh /usr/share/gitbucket/gitbucket.sh
